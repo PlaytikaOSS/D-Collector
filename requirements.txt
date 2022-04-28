@@ -1,0 +1,5 @@
+requests==2.25.1
+boto3==1.12.39
+google_api_python_client==2.44.0
+protobuf==3.20.0
+python_digitalocean==1.17.0

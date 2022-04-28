@@ -1,0 +1,8 @@
+dcollector/config.py
+private-suffixes.txt
+static-appenders.json
+.idea
+domains.json
+build
+*.egg-info
+venv
