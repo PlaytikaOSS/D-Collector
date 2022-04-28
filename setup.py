@@ -22,7 +22,7 @@ setup(
     python_requires='>=3.7',
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache 2.0",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
     entry_points={
