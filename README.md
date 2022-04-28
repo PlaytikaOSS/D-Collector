@@ -29,10 +29,6 @@ domains management and attack surface management.
 
 ## Installation
 ### Prerequisites
-- Install requirements based on requirements.txt
-  ```bash
-  pip install -r requirements.txt
-  ```
 - Copy 'config.py.example' to 'config.py'.
   ```bash
   cp config.py.example config.py
@@ -40,6 +36,18 @@ domains management and attack surface management.
 - Fill the relevant variables (empty configs will be ignored).
 - Define your company's known internal domain suffixes for the tool to classify as private.
   E.g., `.corp`, `.internal`.
+
+### PIP (recommended)
+```bash
+pip install d-collector
+```
+
+### Manual
+```bash
+git clone https://github.com/rotemreiss/D-Collector.git
+cd D-Collector
+pip install .
+```
   
 ---
 
