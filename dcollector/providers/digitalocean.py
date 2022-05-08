@@ -1,6 +1,12 @@
-from dcollector.config import DG_TOKEN
+import os
 import dcollector.utils.utils as utils
 import re
+
+
+def is_enabled():
+    global DG_TOKEN
+    DG_TOKEN = os.getenv('DG_TOKEN')
+    return bool(DG_TOKEN)
 
 
 def get_domains():
@@ -9,7 +15,8 @@ def get_domains():
 
     :return:
     """
-    if not DG_TOKEN:
+
+    if not is_enabled():
         return []
 
     import digitalocean

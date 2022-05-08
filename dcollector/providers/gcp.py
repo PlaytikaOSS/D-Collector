@@ -1,7 +1,13 @@
-import dcollector.main
-from dcollector.config import GCP_PRIVATE_KEY_FILE, GCP_PROJECT
+import os
 import dcollector.utils.utils as utils
 
+
+def is_enabled():
+    global GCP_PRIVATE_KEY_FILE
+    global GCP_PROJECT
+    GCP_PRIVATE_KEY_FILE = os.getenv('GCP_PRIVATE_KEY_FILE')
+    GCP_PROJECT = os.getenv('GCP_PROJECT')
+    return bool(GCP_PROJECT and GCP_PRIVATE_KEY_FILE)
 
 def get_domains():
     """
@@ -9,7 +15,7 @@ def get_domains():
 
     :return:
     """
-    if not GCP_PROJECT or not GCP_PRIVATE_KEY_FILE:
+    if not is_enabled():
         return []
 
     from googleapiclient import discovery

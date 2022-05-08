@@ -29,13 +29,37 @@ domains management and attack surface management.
 
 ## Installation
 ### Prerequisites
-- Copy 'config.py.example' to 'config.py'.
+- Fill the relevant providers' environment variables (empty variables will be ignored):
   ```bash
-  cp config.py.example config.py
+  # Prisma® Cloud (by Palo Alto Networks)
+  export PRISMA_API_KEYID = your-value-here
+  export PRISMA_API_SECRET = your-value-here
+  export PRISMA_URL = your-value-here
+  
+  # AWS (Route53)
+  export AWS_ACCESS_KEY_ID = your-value-here
+  export AWS_SECRET_ACCESS_KEY = your-value-here
+  # (Optional) If needed to assume role for R53 access
+  export AWS_ARN = your-value-here
+  
+  # GCP
+  export GCP_PRIVATE_KEY_FILE = your-value-here
+  export GCP_PROJECT = your-value-here
+  
+  # Digital Ocean
+  export DG_TOKEN = your-value-here
+  
+  # A JSON file contains DNS records in domains fetcher's output format
+  export STATIC_DOMAINS_FILE = your-value-here
   ```
-- Fill the relevant variables (empty configs will be ignored).
 - Define your company's known internal domain suffixes for the tool to classify as private.
   E.g., `.corp`, `.internal`.
+  ```bash
+  # Internal domain suffixes list, e.g., ".corp", ".internal"
+  # Example:
+  # INTERNAL_DOMAIN_SUFFIXES = "['.internal','corp']"
+  export INTERNAL_DOMAIN_SUFFIXES = your-value-here
+  ```
 
 ### PIP (recommended)
 ```bash
@@ -48,16 +72,22 @@ git clone https://github.com/Playtika/D-Collector.git
 cd D-Collector
 pip install .
 ```
-  
 ---
 
 ## Usage
-```bash
-  dcollector
-```
+Short Form    | Long Form            | Description
+------------- | -------------------- |-------------
+-h            | --help               | Show this help message and exit
+-lp            | --list-providers            | Listing loaded providers
+
+### Examples
+- List loaded providers\
+```dcollector -lp```
+- Pull domain names from providers\
+```dcollector```
 
 ## Output Example
-Output Domains file will be in the following format (JSON):
+Output domains file will be in the following format (JSON):
 ```json
 [{"name": "domain name", "record_type": "DNS type (CNAME,A)", "record_value": "value (ip,ec2 domain name)", "is_private": "false/true"}]
 ```
