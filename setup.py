@@ -27,7 +27,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'dcollector=dcollector.main:main',
+            'dcollector=dcollector.main:interactive',
         ],
     },
 )

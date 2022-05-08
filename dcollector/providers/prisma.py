@@ -1,4 +1,4 @@
-from dcollector.config import PRISMA_URL, PRISMA_API_KEYID, PRISMA_API_SECRET
+import os
 import dcollector.utils.utils as utils
 import requests
 import json
@@ -67,14 +67,23 @@ def get_prisma_config(query):
     return resp.json()['data']
 
 
+def is_enabled():
+    global PRISMA_API_SECRET
+    global PRISMA_API_KEYID
+    global PRISMA_URL
+    PRISMA_API_SECRET = os.getenv('PRISMA_API_SECRET')
+    PRISMA_API_KEYID = os.getenv('PRISMA_API_KEYID')
+    PRISMA_URL = os.getenv('PRISMA_URL')
+    return bool(PRISMA_URL and PRISMA_API_KEYID and PRISMA_API_SECRET)
+
+
 def get_domains():
     """
     Pulling all domains from the provider
 
     :return:
     """
-
-    if not PRISMA_URL or not PRISMA_API_KEYID or not PRISMA_API_SECRET:
+    if not is_enabled():
         return []
 
     rql = get_rql()

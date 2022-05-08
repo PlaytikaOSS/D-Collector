@@ -24,14 +24,30 @@ def get_domains():
     )
 
 
-def main():
+def get_enabled_providers():
+    """
+    Returns status of providers based on environment variables
+
+    :return:
+    """
+    return {"aws": aws.is_enabled(), "gcp": gcp.is_enabled(), "dg": digitalocean.is_enabled(),
+                 "prisma": prisma.is_enabled(), "local file": local.is_enabled()}
+
+
+def main(providers):
     """
     Creates a file will all the pulled domains
 
     :return:
     """
-    parser = argparse.ArgumentParser(description='Collect DNS records from various DNS and cloud providers.')
-    args = parser.parse_args()
+
+    if providers:
+        enabled_providers = get_enabled_providers()
+        print("Status of environment variables of providers (True = exists, False = not exists):")
+        for provider in enabled_providers:
+            print(f"{provider} : {enabled_providers[provider]}")
+        return 0
+
 
     # Get records
     domain_list = get_domains()
@@ -43,5 +59,18 @@ def main():
     return 0
 
 
+def interactive():
+    """
+    Getting args from user and passing to main
+
+   :return:
+   """
+    parser = argparse.ArgumentParser(description='Collect DNS records from various DNS and cloud providers.')
+    parser.add_argument('-lp', '--list-providers', help='listing inputed providers', action='store_true',
+                        dest="list_providers")
+    args = parser.parse_args()
+    main(args.list_providers)
+
+
 if __name__ == '__main__':
-    main()
+    interactive()

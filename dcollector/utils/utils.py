@@ -1,5 +1,6 @@
 import ipaddress
-from dcollector.config import INTERNAL_DOMAIN_SUFFIXES
+import os
+import json
 
 
 def is_ip_private(ip):
@@ -19,7 +20,10 @@ def is_domain_internal(domain):
     :param domain:
     :return:
     """
-    for suffix in INTERNAL_DOMAIN_SUFFIXES:
+    INTERNAL_DOMAIN_SUFFIXES = os.getenv('INTERNAL_DOMAIN_SUFFIXES')
+    if not INTERNAL_DOMAIN_SUFFIXES:
+        return False
+    for suffix in json.loads(INTERNAL_DOMAIN_SUFFIXES):
         if domain.endswith(suffix):
             return True
 

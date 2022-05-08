@@ -1,5 +1,10 @@
-from dcollector.config import STATIC_DOMAINS_FILE
+import os
 import json
+
+def is_enabled():
+    global STATIC_DOMAINS_FILE
+    STATIC_DOMAINS_FILE = os.getenv('STATIC_DOMAINS_FILE')
+    return bool(STATIC_DOMAINS_FILE)
 
 
 def get_domains():
@@ -8,7 +13,8 @@ def get_domains():
 
     :return:
     """
-    if not STATIC_DOMAINS_FILE:
+
+    if not is_enabled():
         return []
 
     try:

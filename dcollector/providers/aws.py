@@ -1,6 +1,6 @@
-import dcollector.main
-from dcollector.config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ARN
+import dcollector.utils.utils as utils
 import boto3
+import os
 
 
 def get_session_by_assume_role(role_arn, session_name):
@@ -14,7 +14,7 @@ def get_session_by_assume_role(role_arn, session_name):
     client = boto3.client('sts',
                           aws_access_key_id=AWS_ACCESS_KEY_ID,
                           aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-    response = client.get_session_by_assume_role(RoleArn=role_arn, RoleSessionName=session_name)
+    response = client.assume_role(RoleArn=role_arn, RoleSessionName=session_name)
     session = boto3.Session(aws_access_key_id=response['Credentials']['AccessKeyId'],
                             aws_secret_access_key=response['Credentials']['SecretAccessKey'],
                             aws_session_token=response['Credentials']['SessionToken'])
@@ -49,6 +49,16 @@ def get_boto():
     return client
 
 
+def is_enabled():
+    global AWS_ACCESS_KEY_ID
+    global AWS_SECRET_ACCESS_KEY
+    global AWS_ARN
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_ARN = os.getenv('AWS_ARN')
+    return bool(AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+
+
 def get_domains():
     """
     Pulling all domains from the provider
@@ -56,7 +66,7 @@ def get_domains():
     :return:
     """
 
-    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+    if not is_enabled():
         return []
 
     domains = []
@@ -90,9 +100,9 @@ def get_domains():
 
                                 # check if ip or domain name is private
                                 if domain_data['record_type'] == 'A':
-                                    domain_data['is_private'] = dcollector.main.is_ip_private(domain_data['record_value'])
+                                    domain_data['is_private'] = utils.is_ip_private(domain_data['record_value'])
                                 elif domain_data['record_type'] == 'CNAME':
-                                    domain_data['is_private'] = dcollector.main.is_domain_internal(domain_data['record_value'])
+                                    domain_data['is_private'] = utils.is_domain_internal(domain_data['record_value'])
 
                             domains.append(domain_data)
     except Exception as error:
