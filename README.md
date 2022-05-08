@@ -44,7 +44,7 @@ pip install d-collector
 
 ### Manual
 ```bash
-git clone https://github.com/rotemreiss/D-Collector.git
+git clone https://github.com/Playtika/D-Collector.git
 cd D-Collector
 pip install .
 ```
