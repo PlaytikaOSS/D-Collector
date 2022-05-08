@@ -66,7 +66,7 @@ def interactive():
    :return:
    """
     parser = argparse.ArgumentParser(description='Collect DNS records from various DNS and cloud providers.')
-    parser.add_argument('-lp', '--list-providers', help='listing inputed providers', action='store_true',
+    parser.add_argument('-lp', '--list-providers', help='listing loaded providers', action='store_true',
                         dest="list_providers")
     args = parser.parse_args()
     main(args.list_providers)
