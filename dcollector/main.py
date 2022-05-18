@@ -6,6 +6,7 @@ import dcollector.providers.prisma as prisma
 import dcollector.providers.digitalocean as digitalocean
 import dcollector.providers.file as local
 import dcollector.utils.utils as utils
+import dcollector.providers.cycognito as cycognito
 
 
 def get_domains():
@@ -20,7 +21,8 @@ def get_domains():
         gcp.get_domains() +
         local.get_domains() +
         prisma.get_domains() +
-        digitalocean.get_domains()
+        digitalocean.get_domains() +
+        cycognito.get_domains()
     )
 
 
@@ -31,7 +33,7 @@ def get_enabled_providers():
     :return:
     """
     return {"aws": aws.is_enabled(), "gcp": gcp.is_enabled(), "dg": digitalocean.is_enabled(),
-                 "prisma": prisma.is_enabled(), "local file": local.is_enabled()}
+                 "prisma": prisma.is_enabled(), "cycognito": cycognito.is_enabled(), "local file": local.is_enabled()}
 
 
 def main(providers):

@@ -37,13 +37,13 @@ def remove_dups(records):
     :param records:
     :return:
     """
-    domains = set()
+    uniques = set()
     new_records = []
     for record in records:
-        domains.add(record['name'])
-    for domain in domains:
+        uniques.add(record['name'] + record['record_value'])
+    for unique in uniques:
         for record in records:
-            if domain == record['name']:
+            if unique == record['name'] + record['record_value']:
                 new_records.append(record)
                 break
     return new_records
