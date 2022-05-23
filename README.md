@@ -36,6 +36,10 @@ domains management and attack surface management.
   export PRISMA_API_SECRET = your-value-here
   export PRISMA_URL = your-value-here
   
+  # Cycognito (ASM product)
+  export CY_KEY = your-value-here
+  export CY_REALM = your-value-here
+  
   # AWS (Route53)
   export AWS_ACCESS_KEY_ID = your-value-here
   export AWS_SECRET_ACCESS_KEY = your-value-here
