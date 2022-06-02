@@ -102,7 +102,8 @@ def get_domains():
                     'name': record['name'].rstrip('.').replace('\\052.', ''),
                     'record_type': record['type'],
                     'record_value': '',
-                    'is_private': False
+                    'is_private': False,
+                    'source': 'prisma'
                 }
 
                 if len(record['resourceRecords']):

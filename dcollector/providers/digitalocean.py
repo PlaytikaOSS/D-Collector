@@ -37,7 +37,8 @@ def get_domains():
                         'name': do_domain_name_normalise(r),
                         'record_type': r.type,
                         'record_value': r.data,
-                        'is_private': False
+                        'is_private': False,
+                        'source': 'digitalocean'
                     }
 
                     if domain_data['record_type'] == 'A':

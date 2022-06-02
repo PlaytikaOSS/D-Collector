@@ -93,7 +93,7 @@ Short Form    | Long Form            | Description
 ## Output Example
 Output domains file will be in the following format (JSON):
 ```json
-[{"name": "domain name", "record_type": "DNS type (CNAME,A)", "record_value": "value (ip,ec2 domain name)", "is_private": "false/true"}]
+[{"name": "domain name", "record_type": "DNS type (CNAME,A)", "record_value": "value (ip,ec2 domain name)", "is_private": "false/true", "source": "provider/dns management tool"}]
 ```
 
 ## Cloud Providers and Tools Support
@@ -102,6 +102,7 @@ Output domains file will be in the following format (JSON):
 - GCP
 - Digital Ocean
 - Prisma® Cloud (by Palo Alto Networks)
+- Cycognito (ASM product)
 
 ---
 ## Roadmap
