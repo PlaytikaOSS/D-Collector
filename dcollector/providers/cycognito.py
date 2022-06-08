@@ -46,7 +46,8 @@ def get_domains():
                 'name': asset['domain'].rstrip('.').replace('\\052.', '').replace('*.', ''),
                 'record_type': 'A',
                 'record_value': ip,
-                'is_private': False
+                'is_private': False,
+                'source': 'cycognito'
             }
             domains.append(domain_data)
     return domains

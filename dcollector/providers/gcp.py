@@ -49,7 +49,8 @@ def get_domains():
                                 'name': resource_record_set['name'].rstrip('.').replace('\\052.', '').replace('*.',''),
                                 'record_type': resource_record_set['type'],
                                 'record_value': resource_record_set['rrdatas'][0],
-                                'is_private': False
+                                'is_private': False,
+                                'source': 'gcp'
                             }
 
                             # Check if ip or domain name is private

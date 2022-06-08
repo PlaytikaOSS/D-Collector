@@ -92,7 +92,8 @@ def get_domains():
                                 'name': record['Name'].rstrip('.').replace('\\052.', '').replace('*.',''),
                                 'record_type': record['Type'],
                                 'record_value': '',
-                                'is_private': False
+                                'is_private': False,
+                                'source': 'aws'
                             }
 
                             if 'ResourceRecords' in record:
@@ -103,6 +104,7 @@ def get_domains():
                                     domain_data['is_private'] = utils.is_ip_private(domain_data['record_value'])
                                 elif domain_data['record_type'] == 'CNAME':
                                     domain_data['is_private'] = utils.is_domain_internal(domain_data['record_value'])
+
 
                             domains.append(domain_data)
     except Exception as error:
