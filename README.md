@@ -102,7 +102,7 @@ Output domains file will be in the following format (JSON):
 - GCP
 - Digital Ocean
 - Prisma® Cloud (by Palo Alto Networks)
-- Cycognito (ASM product)
+- Cycognito (EASM product)
 
 ---
 ## Roadmap
