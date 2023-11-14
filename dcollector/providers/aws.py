@@ -1,27 +1,36 @@
 import dcollector.utils.utils as utils
 import boto3
 import os
+import json
 
 
-def get_session_by_assume_role(role_arn, session_name):
+def get_session_by_assume_role(role_arn, session_name, role=""):
     """
     Returns AWS session by assuming a provided role
 
     :param role_arn:
     :param session_name:
+    :param role:
     :return:
     """
     client = boto3.client('sts',
-                          aws_access_key_id=AWS_ACCESS_KEY_ID,
-                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+                              aws_access_key_id=AWS_ACCESS_KEY_ID,
+                              aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
     response = client.assume_role(RoleArn=role_arn, RoleSessionName=session_name)
+    if role:
+        client = boto3.client('sts',
+                              aws_access_key_id=response['Credentials']['AccessKeyId'],
+                              aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+                              aws_session_token=response['Credentials']['SessionToken'])
+        response = client.assume_role(RoleArn=role, RoleSessionName=session_name)
+
     session = boto3.Session(aws_access_key_id=response['Credentials']['AccessKeyId'],
                             aws_secret_access_key=response['Credentials']['SecretAccessKey'],
                             aws_session_token=response['Credentials']['SessionToken'])
     return session
 
 
-def get_boto():
+def get_boto(role=""):
     """
     Returns boto client from aws
 
@@ -39,7 +48,10 @@ def get_boto():
         else:
             # Assuming role provided to connect to AWS
             session_name = str(uuid.uuid4())
-            session = get_session_by_assume_role(AWS_ARN, session_name)
+            if role:
+                session = get_session_by_assume_role(AWS_ARN, session_name, role)
+            else:
+                session = get_session_by_assume_role(AWS_ARN, session_name)
             client = session.client('route53')
     except Exception as error:
         print('An error occurred while trying to authenticate to aws:')
@@ -53,6 +65,8 @@ def is_enabled():
     global AWS_ACCESS_KEY_ID
     global AWS_SECRET_ACCESS_KEY
     global AWS_ARN
+    global AWS_ARN_EXTRA_ROLES_FILE
+    AWS_ARN_EXTRA_ROLES_FILE = os.getenv('AWS_ARN_EXTRA_ROLES_FILE')
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_ARN = os.getenv('AWS_ARN')
@@ -61,17 +75,32 @@ def is_enabled():
 
 def get_domains():
     """
-    Pulling all domains from the provider
+        Pulling all domains from the provider
 
-    :return:
-    """
+        :return:
+        """
+    domains = get_domains_from_client()
+    if AWS_ARN_EXTRA_ROLES_FILE:
+        try:
+            f = open(AWS_ARN_EXTRA_ROLES_FILE)
+            for role in json.load(f):
+                domains.extend(get_domains_from_client(role))
+        except OSError:
+                print(f"Could not open/read file: {AWS_ARN_EXTRA_ROLES_FILE}")
+    return domains
+
+
+def get_domains_from_client(role=""):
 
     if not is_enabled():
         return []
 
     domains = []
 
-    client = get_boto()
+    if role:
+        client = get_boto(role)
+    else:
+        client = get_boto()
 
     if not client:
         return []
