@@ -3,3 +3,4 @@ boto3==1.12.39
 google_api_python_client==2.44.0
 protobuf==3.20.0
 python_digitalocean==1.17.0
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
