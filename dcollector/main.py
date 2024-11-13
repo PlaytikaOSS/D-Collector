@@ -7,6 +7,8 @@ import dcollector.providers.digitalocean as digitalocean
 import dcollector.providers.file as local
 import dcollector.utils.utils as utils
 import dcollector.providers.cycognito as cycognito
+import dcollector.providers.cloudflare as cloudflare
+import dcollector.providers.ns1 as ns1
 
 
 def get_domains():
@@ -22,7 +24,9 @@ def get_domains():
         local.get_domains() +
         prisma.get_domains() +
         digitalocean.get_domains() +
-        cycognito.get_domains()
+        cycognito.get_domains() +
+        cloudflare.get_domains() +
+        ns1.get_domains()
     )
 
 
@@ -33,7 +37,8 @@ def get_enabled_providers():
     :return:
     """
     return {"aws": aws.is_enabled(), "gcp": gcp.is_enabled(), "dg": digitalocean.is_enabled(),
-                 "prisma": prisma.is_enabled(), "cycognito": cycognito.is_enabled(), "local file": local.is_enabled()}
+            "prisma": prisma.is_enabled(), "cycognito": cycognito.is_enabled(), "local file": local.is_enabled(),
+            "cloudflare": cloudflare.is_enabled(), "ns1": ns1.is_enabled()}
 
 
 def main(providers):
@@ -46,10 +51,9 @@ def main(providers):
     if providers:
         enabled_providers = get_enabled_providers()
         print("Status of environment variables of providers (True = exists, False = not exists):")
-        for provider in enabled_providers:
-            print(f"{provider} : {enabled_providers[provider]}")
+        for provider, provider_status in enabled_providers.items():
+            print(f"{provider} : {provider_status}")
         return 0
-
 
     # Get records
     domain_list = get_domains()
