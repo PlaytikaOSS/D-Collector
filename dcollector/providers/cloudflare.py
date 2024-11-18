@@ -1,7 +1,6 @@
 import requests
 import os
 import dcollector.utils.utils as utils
-import json
 
 
 ZONES_ENDPOINT = "https://api.cloudflare.com/client/v4/zones"

@@ -1,7 +1,6 @@
 import requests
 import os
 import dcollector.utils.utils as utils
-import json
 
 
 ZONES_ENDPOINT = "https://api.nsone.net/v1/zones"
