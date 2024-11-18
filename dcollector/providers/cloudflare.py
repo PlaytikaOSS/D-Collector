@@ -1,5 +1,7 @@
 import requests
 import os
+import dcollector.utils.utils as utils
+import json
 
 
 ZONES_ENDPOINT = "https://api.cloudflare.com/client/v4/zones"
@@ -15,6 +17,9 @@ def is_enabled():
 
 
 def get_domains():
+    if not is_enabled():
+        return []
+
     results = []
     headers = {"Authorization": f"Bearer {CLOUDFLARE_TOKEN}",
                "Accept": "application/json"}
@@ -24,15 +29,26 @@ def get_domains():
     response.raise_for_status()
     data = response.json()
     for zone in data.get("result", []):
-        results.append(zone.get("name"))
         zone_id = zone.get("id")
         response = requests.get(DOMAINS_ENDPOINT.format(zone_id),
                                 headers=headers)
         response.raise_for_status()
         sub_domains = response.json().get('result', [])
         for sub_domain in sub_domains:
-            try:
-                results.append(sub_domain.get("name"))
-            except KeyError:
-                print(sub_domain)
+            record_type = sub_domain.get('type')
+            record_value = sub_domain.get('content')
+            if record_type in ["A", "AAAA"]:
+                is_private = utils.is_ip_private(record_value)
+            elif record_type == "CNAME":
+                is_private = utils.is_domain_internal(record_value)
+            else:
+                continue
+            domain_data = {
+                'name': sub_domain.get('name'),
+                'record_type': record_type,
+                'record_value': record_value,
+                'is_private': is_private,
+                'source': 'cloudflare'
+            }
+            results.append(domain_data)
     return results
