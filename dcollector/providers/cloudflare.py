@@ -43,7 +43,7 @@ def get_domains():
             else:
                 continue
             domain_data = {
-                'name': sub_domain.get('name'),
+                'name': sub_domain.get('name').rstrip('.').replace('\\052.', '').replace('*.', ''),
                 'record_type': record_type,
                 'record_value': record_value,
                 'is_private': is_private,
