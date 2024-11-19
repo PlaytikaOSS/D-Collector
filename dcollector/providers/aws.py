@@ -105,7 +105,6 @@ def get_domains():
                                 elif domain_data['record_type'] == 'CNAME':
                                     domain_data['is_private'] = utils.is_domain_internal(domain_data['record_value'])
 
-
                             domains.append(domain_data)
     except Exception as error:
         print('An error occurred while trying to get aws records:')
