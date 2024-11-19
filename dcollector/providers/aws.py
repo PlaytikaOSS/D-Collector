@@ -103,6 +103,7 @@ def get_domains():
                 aws_roles = json.load(f)
         except OSError:
             print(f"Could not open/read file: {AWS_ARN_EXTRA_ROLES_FILE}")
+            return domains
         for role in aws_roles:
             domains.extend(get_domains_from_client(role))
     return domains
