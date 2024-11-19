@@ -42,7 +42,7 @@ def get_domains():
                     continue
                 for record in record_value:
                     domain_data = {
-                        'name': domain_name,
+                        'name': domain_name.rstrip('.').replace('\\052.', '').replace('*.', ''),
                         'record_type': record_type,
                         'record_value': record,
                         'is_private': is_private,

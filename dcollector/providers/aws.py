@@ -2,6 +2,7 @@ import dcollector.utils.utils as utils
 import boto3
 import os
 import json
+import uuid
 
 
 def get_session_by_assume_role(role_arn, session_name, secondary_role_arn=None):
@@ -94,15 +95,16 @@ def get_domains():
         Pulling all domains from the provider
 
         :return:
-        """
+    """
     domains = get_domains_from_client()
     if AWS_ARN_EXTRA_ROLES_FILE:
         try:
-            f = open(AWS_ARN_EXTRA_ROLES_FILE)
-            for role in json.load(f):
-                domains.extend(get_domains_from_client(role))
+            with open(AWS_ARN_EXTRA_ROLES_FILE) as f:
+                aws_roles = json.load(f)
         except OSError:
-                print(f"Could not open/read file: {AWS_ARN_EXTRA_ROLES_FILE}")
+            print(f"Could not open/read file: {AWS_ARN_EXTRA_ROLES_FILE}")
+        for role in aws_roles:
+            domains.extend(get_domains_from_client(role))
     return domains
 
 
