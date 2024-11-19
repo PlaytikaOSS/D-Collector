@@ -1,58 +1,88 @@
 import dcollector.utils.utils as utils
 import boto3
 import os
+import json
 
 
-def get_session_by_assume_role(role_arn, session_name):
+def get_session_by_assume_role(role_arn, session_name, secondary_role_arn=None):
     """
-    Returns AWS session by assuming a provided role
+    Returns an AWS session by assuming a provided role.
+    Optionally, assumes a secondary role using credentials from the first assumed role.
 
-    :param role_arn:
-    :param session_name:
-    :return:
+    :param role_arn: The ARN of the primary role to assume.
+    :param session_name: The name for the assumed session.
+    :param secondary_role_arn: (Optional) ARN of a secondary role to assume using the credentials of the first.
+    :return: boto3.Session with the assumed role credentials.
     """
-    client = boto3.client('sts',
-                          aws_access_key_id=AWS_ACCESS_KEY_ID,
-                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-    response = client.assume_role(RoleArn=role_arn, RoleSessionName=session_name)
-    session = boto3.Session(aws_access_key_id=response['Credentials']['AccessKeyId'],
-                            aws_secret_access_key=response['Credentials']['SecretAccessKey'],
-                            aws_session_token=response['Credentials']['SessionToken'])
-    return session
+    # Assume the primary role
+    sts_client = boto3.client('sts', 
+                              aws_access_key_id=AWS_ACCESS_KEY_ID,
+                              aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+                              )
+    primary_response = sts_client.assume_role(
+        RoleArn=role_arn,
+        RoleSessionName=session_name
+    )
+
+    # Extract credentials from the primary role
+    credentials = primary_response['Credentials']
+
+    # If a secondary role ARN is provided, assume that role using the primary role's credentials
+    if secondary_role_arn:
+        sts_client = boto3.client(
+            'sts',
+            aws_access_key_id=credentials['AccessKeyId'],
+            aws_secret_access_key=credentials['SecretAccessKey'],
+            aws_session_token=credentials['SessionToken']
+        )
+        secondary_response = sts_client.assume_role(
+            RoleArn=secondary_role_arn,
+            RoleSessionName=session_name
+        )
+        credentials = secondary_response['Credentials']
+
+    # Return a boto3 session using the final credentials
+    return boto3.Session(
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken']
+    )
 
 
-def get_boto():
+def get_boto(role=None):
     """
-    Returns boto client from aws
+    Returns a boto3 Route53 client, optionally assuming a role.
 
-    :return:
+    :param role: (Optional) ARN of a secondary role to assume after assuming the main role.
+    :return: boto3 Route53 client or None if an error occurs.
     """
-    import uuid
     try:
         if not AWS_ARN:
             # Connecting directly to AWS account
             client = boto3.client(
-                'route53',
+                "route53",
                 aws_access_key_id=AWS_ACCESS_KEY_ID,
                 aws_secret_access_key=AWS_SECRET_ACCESS_KEY
             )
         else:
             # Assuming role provided to connect to AWS
             session_name = str(uuid.uuid4())
-            session = get_session_by_assume_role(AWS_ARN, session_name)
-            client = session.client('route53')
-    except Exception as error:
-        print('An error occurred while trying to authenticate to aws:')
-        print(str(error))
-        return ""
+            session = get_session_by_assume_role(AWS_ARN, session_name, secondary_role_arn=role)
+            client = session.client("route53")
 
-    return client
+        return client
+
+    except Exception as error:
+        print(f"An error occurred while trying to authenticate to AWS: {error}")
+        return None
 
 
 def is_enabled():
     global AWS_ACCESS_KEY_ID
     global AWS_SECRET_ACCESS_KEY
     global AWS_ARN
+    global AWS_ARN_EXTRA_ROLES_FILE
+    AWS_ARN_EXTRA_ROLES_FILE = os.getenv('AWS_ARN_EXTRA_ROLES_FILE')
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_ARN = os.getenv('AWS_ARN')
@@ -61,17 +91,29 @@ def is_enabled():
 
 def get_domains():
     """
-    Pulling all domains from the provider
+        Pulling all domains from the provider
 
-    :return:
-    """
+        :return:
+        """
+    domains = get_domains_from_client()
+    if AWS_ARN_EXTRA_ROLES_FILE:
+        try:
+            f = open(AWS_ARN_EXTRA_ROLES_FILE)
+            for role in json.load(f):
+                domains.extend(get_domains_from_client(role))
+        except OSError:
+                print(f"Could not open/read file: {AWS_ARN_EXTRA_ROLES_FILE}")
+    return domains
+
+
+def get_domains_from_client(role=None):
 
     if not is_enabled():
         return []
 
     domains = []
 
-    client = get_boto()
+    client = get_boto(role)
 
     if not client:
         return []

@@ -43,8 +43,16 @@ domains management and attack surface management.
   # AWS (Route53)
   export AWS_ACCESS_KEY_ID = your-value-here
   export AWS_SECRET_ACCESS_KEY = your-value-here
-  # (Optional) If needed to assume role for R53 access
-  export AWS_ARN = your-value-here
+  # (Optional) If needed to assume a primary role for Route53 access
+  export AWS_ARN=your-value-here
+  # (Optional) JSON file containing additional roles to assume
+  # This file should contain a list of role ARNs for additional Route53 accounts or permissions. Example:
+  #
+  # [
+  #   "arn:aws:iam::123456789012:role/Role1",
+  #   "arn:aws:iam::123456789012:role/Role2"
+  # ]
+  export AWS_ARN_EXTRA_ROLES_FILE=/path/to/roles.json
   
   # GCP
   export GCP_PRIVATE_KEY_FILE = your-value-here
@@ -98,7 +106,7 @@ Output domains file will be in the following format (JSON):
 
 ## Cloud Providers and Tools Support
 - Static domains from file
-- AWS
+- AWS (Supports primary role and additional roles via JSON file)
 - GCP
 - Digital Ocean
 - Prisma® Cloud (by Palo Alto Networks)
