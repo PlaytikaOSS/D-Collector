@@ -6,5 +6,5 @@ python_digitalocean==1.17.0
 urllib3==1.26.20
 
 # Security Pinned
-certifi==2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
+certifi==2024.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp==3.21.0 # not directly required, pinned by Snyk to avoid a vulnerability
